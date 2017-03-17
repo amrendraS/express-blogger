@@ -1,0 +1,3 @@
+*.log
+
+/blogger/node_modules
