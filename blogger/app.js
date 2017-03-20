@@ -1,29 +1,41 @@
-var express      = require('express');
-var path         = require('path');
-var favicon      = require('serve-favicon');
-var logger       = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser   = require('body-parser');
+var express      = require('express'),
+		path         = require('path'),
+		favicon      = require('serve-favicon'),
+		logger       = require('morgan'),
+		cookieParser = require('cookie-parser'),
+		bodyParser   = require('body-parser'),
+		index        = require('./routes/index'),
+		users        = require('./routes/users'),
+		admin        = require('./routes/admin'),
+		config       = require('./config'),
+		dbHandler    = require('./dbHandler'),
+		app          = express();
 
-var index        = require('./routes/index');
-var users        = require('./routes/users');
+// Initiate database connection
+dbHandler.createConnection();
 
-var app          = express();
+// After an interval handle data initialization
+setTimeout(function(){
+	dbHandler.createAdmin(dbHandler.db);
+}, 5000)
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// app.set('views', path.join(__dirname, 'views'));
+// app.use(express.static(path.join(__dirname, '/views/src')));
+// app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(express.static(path.join(__dirname, 'views')));
+app.use(express.static('public'))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/admin', admin);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
